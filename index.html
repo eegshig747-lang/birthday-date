@@ -3,77 +3,54 @@
 <html lang="mn">
 <head>
   <meta charset="UTF-8">
-
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
-
   <meta name="theme-color" content="#402821">
 
-  <title>Happy Birthday</title>
+  <title>Happy Birthday | Date Invitation</title>
 
-  <!-- FONTS -->
   <link rel="preconnect"
         href="https://fonts.googleapis.com">
-
   <link rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
+        href="https://fonts.gstatic.com" crossorigin>
 
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&display=swap"
     rel="stylesheet">
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
-
-  <!-- JAVASCRIPT -->
   <script src="script.js" defer></script>
 </head>
 
 <body>
-
 <main class="app">
 
-  <!-- ================================= -->
-  <!-- PAGE 1: HAPPY BIRTHDAY            -->
-  <!-- ================================= -->
-
+  <!-- HOME: PHOTO BOOTH -->
   <section id="home" class="page active">
-
     <div class="page-content">
 
-      <!-- HAPPY BIRTHDAY TITLE -->
       <div class="heading">
         <span class="small-title">HAPPY</span>
         <h1>Birthday!</h1>
       </div>
 
-      <!-- VINTAGE PHOTO BOOTH -->
       <div class="machine">
-
         <div class="machine-detail"></div>
 
-        <!-- PHOTO PRINTING SLOT -->
         <div class="machine-slot">
-
           <div id="photoPaper" class="photo-paper">
-
             <img
-              src="images/birthday.jpg"
-              alt="Birthday Photo"
-              class="printed-photo">
-
+              src="birthday.jpg"
+              class="printed-photo"
+              alt="Birthday Photo">
           </div>
-
         </div>
 
-        <!-- MACHINE CONTROLS -->
         <div class="machine-controls">
-
           <button
             id="printButton"
             class="metal-button"
-            aria-label="Print birthday photo">
+            aria-label="Print photo">
           </button>
 
           <span>PRESS</span>
@@ -81,12 +58,9 @@
           <div class="machine-label">
             PHOTO<br>BOOTH
           </div>
-
         </div>
-
       </div>
 
-      <!-- NEXT PAGE -->
       <button
         id="openButton"
         class="main-button"
@@ -96,93 +70,83 @@
 
     </div>
 
-    <!-- VINTAGE DECORATIONS -->
     <div class="decorations">
-
-      <img
-        src="images/decorations/lace.png"
-        class="decor lace"
-        alt="">
-
-      <img
-        src="images/decorations/flowers.png"
-        class="decor flowers"
-        alt="">
-
-      <img
-        src="images/decorations/bow.png"
-        class="decor bow"
-        alt="">
-
+      <img src="lace.png" class="decor lace" alt="">
+      <img src="flowers.png" class="decor flowers" alt="">
+      <img src="bow.png" class="decor bow" alt="">
     </div>
-
   </section>
 
-
-  <!-- ================================= -->
-  <!-- PAGE 2: CHOOSE A DATE             -->
-  <!-- ================================= -->
-
+  <!-- DATE SELECTION -->
   <section id="dates" class="page">
-
     <div class="page-content">
 
-      <h1 class="script-title">
-        Choose a Date
-      </h1>
+      <h1 class="script-title">Choose a Date</h1>
 
       <div class="date-grid">
 
-        <!-- CERAMIC DATE -->
+        <!-- 1. CERAMIC -->
         <button
           class="date-card"
           data-date="Ceramic Date">
-
-          <img
-            src="images/ceramic.jpg"
-            alt="Ceramic Date">
-
+          <img src="ceramic.jpg" alt="Ceramic Date">
           <span>Ceramic Date</span>
-
         </button>
 
-        <!-- COMEDY DATE -->
+        <!-- 2. COMEDY -->
         <button
           class="date-card"
           data-date="Хошин шог үзэх">
-
-          <img
-            src="images/comedy.png"
-            alt="Хошин шог үзэх">
-
-          <span>Хошин шог</span>
-
+          <img src="comedy.png" alt="Хошин шог үзэх">
+          <span>Хошин шог үзэх</span>
         </button>
 
-        <!-- CANVAS ART -->
+        <!-- 3. CANVAS ART -->
         <button
           class="date-card"
           data-date="Canvas Art">
-
-          <img
-            src="images/canvas.jpg"
-            alt="Canvas Art">
-
+          <img src="canvas.jpg" alt="Canvas Art">
           <span>Canvas Art</span>
-
         </button>
 
-        <!-- BRACELET -->
+        <!-- 4. BRACELET -->
         <button
           class="date-card"
           data-date="Чулуун бугуйвч урлах">
-
           <img
-            src="images/bracelet.jpg"
+            src="bracelet.jpg"
             alt="Чулуун бугуйвч урлах">
-
           <span>Чулуун бугуйвч урлах</span>
+        </button>
 
+        <!-- 5. WINE & CANDLE ART -->
+        <button
+          class="date-card"
+          data-date="Wine & Candle Art">
+          <img
+            src="wine-candle.jpg"
+            alt="Wine & Candle Art">
+          <span>Wine & Candle Art</span>
+        </button>
+
+        <!-- 6. CAKE PAINTING -->
+        <button
+          class="date-card"
+          data-date="Cake Painting Date">
+          <img
+            src="cake-day.jpg"
+            alt="Cake Painting Date">
+          <span>Cake Painting Date</span>
+        </button>
+
+        <!-- 7. CANDLE PAINTING -->
+        <button
+          class="date-card"
+          data-date="Candle Painting Date">
+          <img
+            src="candle-painting.jpg"
+            alt="Candle Painting Date">
+          <span>Candle Painting Date</span>
         </button>
 
       </div>
@@ -202,79 +166,39 @@
 
     </div>
 
-    <!-- DECORATIONS -->
     <div class="decorations">
-
-      <img
-        src="images/decorations/lace.png"
-        class="decor lace"
-        alt="">
-
-      <img
-        src="images/decorations/flowers.png"
-        class="decor flowers"
-        alt="">
-
-      <img
-        src="images/decorations/bow.png"
-        class="decor bow"
-        alt="">
-
+      <img src="lace.png" class="decor lace" alt="">
+      <img src="flowers.png" class="decor flowers" alt="">
+      <img src="bow.png" class="decor bow" alt="">
     </div>
-
   </section>
 
-
-  <!-- ================================= -->
-  <!-- PAGE 2.1: COMEDY SHOW             -->
-  <!-- ================================= -->
-
+  <!-- COMEDY SHOW SELECTION -->
   <section id="comedy" class="page">
-
     <div class="page-content">
 
-      <h1 class="mongolian-title">
-        Хошин шог үзэх
-      </h1>
+      <h1 class="mongolian-title">Хошин шог үзэх</h1>
 
       <div class="date-grid comedy-grid">
 
-        <!-- COMEDY SHOW 1 -->
         <button
           class="show-card"
           data-show="Бүгд инээх дуртай">
-
           <img
-            src="images/comedy1.png"
+            src="comedy1.png"
             alt="Бүгд инээх дуртай">
-
-          <span>
-            Бүгд инээх дуртай
-          </span>
-
-          <small>
-            Соёлын төв өргөө
-          </small>
-
+          <span>Бүгд инээх дуртай</span>
+          <small>Соёлын төв өргөө</small>
         </button>
 
-        <!-- COMEDY SHOW 2 -->
         <button
           class="show-card"
           data-show="Хайр түгээе">
-
           <img
-            src="images/comedy2.png"
+            src="comedy2.png"
             alt="Хайр түгээе">
-
-          <span>
-            Хайр түгээе
-          </span>
-
-          <small>
-            МҮЭСТО
-          </small>
-
+          <span>Хайр түгээе</span>
+          <small>МҮЭСТО</small>
         </button>
 
       </div>
@@ -294,70 +218,39 @@
 
     </div>
 
-    <!-- DECORATIONS -->
     <div class="decorations">
-
-      <img
-        src="images/decorations/lace.png"
-        class="decor lace"
-        alt="">
-
-      <img
-        src="images/decorations/flowers.png"
-        class="decor flowers"
-        alt="">
-
-      <img
-        src="images/decorations/bow.png"
-        class="decor bow"
-        alt="">
-
+      <img src="lace.png" class="decor lace" alt="">
+      <img src="flowers.png" class="decor flowers" alt="">
+      <img src="bow.png" class="decor bow" alt="">
     </div>
-
   </section>
 
-
-  <!-- ================================= -->
-  <!-- PAGE 3: CALENDAR                  -->
-  <!-- ================================= -->
-
+  <!-- CALENDAR -->
   <section id="calendarPage" class="page">
-
     <div class="page-content">
 
-      <h1 class="script-title">
-        Choose a Day
-      </h1>
+      <h1 class="script-title">Choose a Day</h1>
 
-      <!-- CALENDAR -->
       <div id="calendarBox" class="calendar-box">
 
         <div class="calendar-header">
-
           <button
             id="prevMonth"
-            aria-label="Previous month">
-            ‹
-          </button>
+            aria-label="Previous month">‹</button>
 
           <span id="monthTitle"></span>
 
           <button
             id="nextMonth"
-            aria-label="Next month">
-            ›
-          </button>
-
+            aria-label="Next month">›</button>
         </div>
 
         <div
           id="calendarDays"
           class="calendar-days">
         </div>
-
       </div>
 
-      <!-- DONE -->
       <button
         id="doneButton"
         class="main-button"
@@ -365,17 +258,18 @@
         DONE ♡
       </button>
 
-      <!-- BACK -->
       <button
         id="calendarBack"
         class="back-button">
         ← BACK
       </button>
 
-      <!-- CONFIRMATION -->
+      <!-- RESULT -->
       <div
         id="confirmation"
         class="confirmation hidden">
+
+        <div class="confirmation-flower">❦</div>
 
         <h2>Done ♡</h2>
 
@@ -397,29 +291,13 @@
 
     </div>
 
-    <!-- DECORATIONS -->
     <div class="decorations">
-
-      <img
-        src="images/decorations/lace.png"
-        class="decor lace"
-        alt="">
-
-      <img
-        src="images/decorations/flowers.png"
-        class="decor flowers"
-        alt="">
-
-      <img
-        src="images/decorations/bow.png"
-        class="decor bow"
-        alt="">
-
+      <img src="lace.png" class="decor lace" alt="">
+      <img src="flowers.png" class="decor flowers" alt="">
+      <img src="bow.png" class="decor bow" alt="">
     </div>
-
   </section>
 
 </main>
-
 </body>
 </html>

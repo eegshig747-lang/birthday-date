@@ -1,120 +1,148 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjP6NN6R8jvc26uHZsz2FrfsuWA9W-mAl0fQwTSWBew3GwiHDbzXYelbgAjJuSpAw7/exec";
+
+"use strict";
+
+// =======================================
+// 1. GOOGLE APPS SCRIPT
+// =======================================
+
+// Өмнө нь Gmail рүү амжилттай илгээж байсан URL
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbyjP6NN6R8jvc26uHZsz2FrfsuWA9W-mAI0fQwTSWBew3GwiHDbzXYelbgAjJuSpAw7/exec";
+
+// =======================================
+// 2. HELPERS
+// =======================================
 
 const $ = (id) => document.getElementById(id);
 
-let selectedDate = "";
-let selectedShow = "";
-let selectedDay = null;
+const pages = document.querySelectorAll(".page");
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-
-let year = today.getFullYear();
-let month = today.getMonth();
-let audioContext;
-
-// НҮҮР СОЛИХ
-function showPage(id) {
-  document.querySelectorAll(".page").forEach(page => {
-    page.classList.toggle("active", page.id === id);
+function showPage(pageId) {
+  pages.forEach((page) => {
+    page.classList.toggle("active", page.id === pageId);
   });
 
   window.scrollTo(0, 0);
 }
 
-// PHOTO BOOTH МЕХАНИК ДУУ
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+// =======================================
+// 3. VARIABLES
+// =======================================
+
+let selectedDate = "";
+let selectedShow = "";
+let selectedDay = null;
+
+let currentMonth = new Date();
+currentMonth.setDate(1);
+
+let hasPrinted = false;
+
+// =======================================
+// 4. PHOTO BOOTH
+// =======================================
+
 function playPrintSound() {
   try {
-    audioContext ??= new (
-      window.AudioContext || window.webkitAudioContext
-    )();
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
 
-    audioContext.resume();
+    if (!AudioContextClass) return;
 
-    const duration = 2.7;
-    const sampleRate = audioContext.sampleRate;
-    const length = Math.floor(sampleRate * duration);
+    const audioContext = new AudioContextClass();
 
-    const buffer = audioContext.createBuffer(
-      1, length, sampleRate
-    );
-
-    const data = buffer.getChannelData(0);
-
-    for (let i = 0; i < length; i++) {
-      const time = i / sampleRate;
-
-      const pulse = Math.sin(
-        time * 2 * Math.PI * 24
-      );
-
-      const noise = Math.random() * 2 - 1;
-
-      data[i] = (
-        pulse * 0.035 +
-        noise * 0.025
-      ) * Math.min(1, (duration - time) * 4);
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
     }
 
-    const source = audioContext.createBufferSource();
+    const oscillator = audioContext.createOscillator();
     const gain = audioContext.createGain();
 
-    source.buffer = buffer;
-    source.connect(gain);
+    oscillator.type = "sawtooth";
+    oscillator.frequency.setValueAtTime(
+      90,
+      audioContext.currentTime
+    );
+
+    oscillator.frequency.linearRampToValueAtTime(
+      55,
+      audioContext.currentTime + 0.45
+    );
+
+    gain.gain.setValueAtTime(
+      0.025,
+      audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      audioContext.currentTime + 0.5
+    );
+
+    oscillator.connect(gain);
     gain.connect(audioContext.destination);
 
-    gain.gain.value = 0.6;
-    source.start();
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.5);
 
+    oscillator.onended = () => {
+      audioContext.close();
+    };
   } catch (error) {
-    console.log("Audio unavailable");
+    console.log("Sound unavailable:", error);
   }
 }
 
-// PHOTO BOOTH-ООС ЗУРАГ ХЭВЛЭХ
 $("printButton").addEventListener("click", () => {
-  const paper = $("photoPaper");
+  if (hasPrinted) return;
 
-  if (paper.classList.contains("printed")) return;
+  hasPrinted = true;
+
+  $("printButton").disabled = true;
 
   playPrintSound();
 
-  paper.classList.add("printed");
-  $("printButton").disabled = true;
+  $("photoPaper").classList.add("printed");
 
   setTimeout(() => {
     $("openButton").disabled = false;
   }, 3000);
 });
 
-// ЭХНИЙ НҮҮРЭЭС БОЛЗОО РУУ
 $("openButton").addEventListener("click", () => {
   showPage("dates");
 });
 
-// 4 БОЛЗООНЫ СОНГОЛТ
-document.querySelectorAll(".date-card").forEach(card => {
+$("datesBack").addEventListener("click", () => {
+  showPage("home");
+});
+
+// =======================================
+// 5. DATE SELECTION
+// =======================================
+
+const dateCards = document.querySelectorAll(".date-card");
+
+dateCards.forEach((card) => {
   card.addEventListener("click", () => {
-    document.querySelectorAll(".date-card").forEach(item => {
+    dateCards.forEach((item) => {
       item.classList.remove("selected");
     });
 
     card.classList.add("selected");
 
-    const newDate = card.dataset.date;
+    selectedDate = card.dataset.date;
+    selectedShow = "";
+    selectedDay = null;
 
-    if (selectedDate !== newDate) {
-      selectedShow = "";
-      selectedDay = null;
-
-      document.querySelectorAll(".show-card").forEach(item => {
-        item.classList.remove("selected");
-      });
-
-      $("comedyNext").disabled = true;
-    }
-
-    selectedDate = newDate;
     $("dateNext").disabled = false;
   });
 });
@@ -129,26 +157,30 @@ $("dateNext").addEventListener("click", () => {
   }
 });
 
-// DATE SELECTION-ЭЭС БУЦАХ
-$("datesBack").addEventListener("click", () => {
-  showPage("home");
-});
+// =======================================
+// 6. COMEDY SHOW SELECTION
+// =======================================
 
-// ХОШИН ШОГИЙН 2 СОНГОЛТ
-document.querySelectorAll(".show-card").forEach(card => {
+const showCards = document.querySelectorAll(".show-card");
+
+showCards.forEach((card) => {
   card.addEventListener("click", () => {
-    document.querySelectorAll(".show-card").forEach(item => {
+    showCards.forEach((item) => {
       item.classList.remove("selected");
     });
 
     card.classList.add("selected");
+
     selectedShow = card.dataset.show;
+    selectedDay = null;
+
     $("comedyNext").disabled = false;
   });
 });
 
 $("comedyNext").addEventListener("click", () => {
   if (!selectedShow) return;
+
   openCalendar();
 });
 
@@ -156,15 +188,49 @@ $("comedyBack").addEventListener("click", () => {
   showPage("dates");
 });
 
-// КАЛЕНДАРЬ НЭЭХ
-function openCalendar() {
-  selectedDay = null;
+// =======================================
+// 7. CALENDAR
+// =======================================
 
-  year = today.getFullYear();
-  month = today.getMonth();
+const WEEKDAYS = [
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat"
+];
+
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
+function openCalendar() {
+  const today = new Date();
+
+  currentMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1
+  );
+
+  selectedDay = null;
 
   $("doneButton").disabled = true;
   $("doneButton").classList.remove("hidden");
+
   $("calendarBox").classList.remove("hidden");
   $("calendarBack").classList.remove("hidden");
   $("confirmation").classList.add("hidden");
@@ -173,107 +239,136 @@ function openCalendar() {
   showPage("calendarPage");
 }
 
-// КАЛЕНДАРЬ ҮҮСГЭХ
 function renderCalendar() {
-  const calendar = $("calendarDays");
-  calendar.innerHTML = "";
-
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
 
   $("monthTitle").textContent =
-    new Intl.DateTimeFormat("en", {
-      month: "long",
-      year: "numeric"
-    }).format(new Date(year, month, 1));
+    `${MONTHS[month]} ${year}`;
 
-  const weekNames = [
-    "Sun", "Mon", "Tue", "Wed",
-    "Thu", "Fri", "Sat"
-  ];
+  const calendarDays = $("calendarDays");
+  calendarDays.innerHTML = "";
 
-  weekNames.forEach(name => {
-    const label = document.createElement("div");
-    label.className = "weekday";
-    label.textContent = name;
-    calendar.appendChild(label);
+  // Weekday headings
+  WEEKDAYS.forEach((weekday) => {
+    const heading = document.createElement("div");
+
+    heading.className = "weekday";
+    heading.textContent = weekday;
+
+    calendarDays.appendChild(heading);
   });
 
+  const firstDay = new Date(year, month, 1).getDay();
+
+  const daysInMonth = new Date(
+    year,
+    month + 1,
+    0
+  ).getDate();
+
+  // Empty spaces before first date
   for (let i = 0; i < firstDay; i++) {
-    calendar.appendChild(document.createElement("div"));
+    const empty = document.createElement("div");
+    calendarDays.appendChild(empty);
   }
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Calendar dates
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
+
     const button = document.createElement("button");
 
     button.className = "day";
     button.textContent = day;
+    button.type = "button";
 
     const isPast = date < today;
 
+    const weekday = date.getDay();
+
     const isWeekend =
-      date.getDay() === 0 ||
-      date.getDay() === 6;
+      weekday === 0 || weekday === 6;
 
-    const isComedy =
-      selectedDate === "Хошин шог үзэх";
+    // Comedy date: Monday - Friday only
+    const comedyWeekend =
+      selectedDate === "Хошин шог үзэх" &&
+      isWeekend;
 
-    // Хошин шог бол зөвхөн Даваа-Баасан
-    button.disabled =
-      isPast || (isComedy && isWeekend);
+    if (isPast || comedyWeekend) {
+      button.disabled = true;
+    }
 
     if (
       selectedDay &&
-      date.toDateString() === selectedDay.toDateString()
+      formatDate(selectedDay) === formatDate(date)
     ) {
       button.classList.add("selected");
     }
 
     button.addEventListener("click", () => {
+      if (button.disabled) return;
+
       selectedDay = date;
+
+      document.querySelectorAll(".day").forEach(
+        (item) => item.classList.remove("selected")
+      );
+
+      button.classList.add("selected");
+
       $("doneButton").disabled = false;
-      renderCalendar();
     });
 
-    calendar.appendChild(button);
+    calendarDays.appendChild(button);
   }
+
+  // Disable previous months before current month
+  const currentFirst = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1
+  );
 
   $("prevMonth").disabled =
-    year === today.getFullYear() &&
-    month === today.getMonth();
+    currentMonth.getTime() <= currentFirst.getTime();
 }
 
-// ӨМНӨХ САР
 $("prevMonth").addEventListener("click", () => {
-  if (
-    year === today.getFullYear() &&
-    month === today.getMonth()
-  ) return;
+  const today = new Date();
 
-  if (month === 0) {
-    month = 11;
-    year--;
-  } else {
-    month--;
-  }
+  const earliestMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1
+  );
+
+  const previousMonth = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth() - 1,
+    1
+  );
+
+  if (previousMonth < earliestMonth) return;
+
+  currentMonth = previousMonth;
 
   renderCalendar();
 });
 
-// ДАРААГИЙН САР
 $("nextMonth").addEventListener("click", () => {
-  if (month === 11) {
-    month = 0;
-    year++;
-  } else {
-    month++;
-  }
+  currentMonth = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth() + 1,
+    1
+  );
 
   renderCalendar();
 });
 
-// КАЛЕНДАРИАС БУЦАХ
 $("calendarBack").addEventListener("click", () => {
   if (selectedDate === "Хошин шог үзэх") {
     showPage("comedy");
@@ -282,26 +377,33 @@ $("calendarBack").addEventListener("click", () => {
   }
 });
 
-// DONE
+// =======================================
+// 8. DONE + GMAIL
+// =======================================
 
 $("doneButton").addEventListener("click", async () => {
-  if (!selectedDay || !selectedDate) return;
+  if (!selectedDate || !selectedDay) return;
+
+  if (
+    selectedDate === "Хошин шог үзэх" &&
+    !selectedShow
+  ) {
+    return;
+  }
 
   const button = $("doneButton");
+
   button.disabled = true;
   button.textContent = "SENDING...";
 
-  const formattedDay = [
-    selectedDay.getFullYear(),
-    String(selectedDay.getMonth() + 1).padStart(2, "0"),
-    String(selectedDay.getDate()).padStart(2, "0")
-  ].join("-");
+  const formattedDay = formatDate(selectedDay);
 
   const data = {
     dateType: selectedDate,
-    show: selectedDate === "Хошин шог үзэх"
-      ? selectedShow
-      : "",
+    show:
+      selectedDate === "Хошин шог үзэх"
+        ? selectedShow
+        : "",
     selectedDay: formattedDay
   };
 
@@ -328,20 +430,60 @@ $("doneButton").addEventListener("click", async () => {
     $("calendarBox").classList.add("hidden");
     $("doneButton").classList.add("hidden");
     $("calendarBack").classList.add("hidden");
+
     $("confirmation").classList.remove("hidden");
 
   } catch (error) {
-    alert("Хүсэлт илгээхэд алдаа гарлаа. Дахин оролдоно уу.");
+    console.error("Email request failed:", error);
+
+    alert(
+      "Мэдээлэл илгээхэд алдаа гарлаа. " +
+      "Интернэт холболтоо шалгаад дахин оролдоно уу."
+    );
+
   } finally {
     button.textContent = "DONE ♡";
     button.disabled = false;
   }
 });
 
+// =======================================
+// 9. SHARE
+// =======================================
 
-// DONE ХЭСГЭЭС БУЦАХ
+$("shareButton").addEventListener("click", async () => {
+  const shareText =
+    "Our Date ♡\n\n" +
+    $("resultText").textContent;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "Birthday Date Invitation",
+        text: shareText
+      });
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        console.error(error);
+      }
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(shareText);
+      alert("Date information copied ♡");
+    } catch (error) {
+      alert(shareText);
+    }
+  }
+});
+
+// =======================================
+// 10. BACK FROM CONFIRMATION
+// =======================================
+
 $("resultBack").addEventListener("click", () => {
   $("confirmation").classList.add("hidden");
+
   $("calendarBox").classList.remove("hidden");
   $("doneButton").classList.remove("hidden");
   $("calendarBack").classList.remove("hidden");
@@ -349,23 +491,8 @@ $("resultBack").addEventListener("click", () => {
   renderCalendar();
 });
 
-// SHARE
-$("shareButton").addEventListener("click", async () => {
-  const message = $("resultText").textContent;
+// =======================================
+// 11. INITIAL STATE
+// =======================================
 
-  if (navigator.share) {
-    try {
-      await navigator.share({ text: message });
-      return;
-    } catch (error) {
-      if (error.name === "AbortError") return;
-    }
-  }
-
-  try {
-    await navigator.clipboard.writeText(message);
-    $("shareButton").textContent = "COPIED ✓";
-  } catch (error) {
-    window.prompt("Copy your selection:", message);
-  }
-});
+showPage("home");
